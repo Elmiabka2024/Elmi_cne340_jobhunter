@@ -1,3 +1,7 @@
+# Elmi Aden
+#CNE340 - 2/9/2025
+#Jobhunter Assignment
+#Creating a python script that fetches jobs from job posting website and uploads it into database local LAMP
 import mysql.connector
 import time
 import json
