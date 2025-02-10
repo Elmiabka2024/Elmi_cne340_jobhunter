@@ -52,13 +52,15 @@ def add_new_job(cursor, jobdetails):
 # Check if new job
 def check_if_job_exists(cursor, jobdetails):
     ##Add your code here
-    query = "UPDATE"
+    job_id = jobdetails['job_id']
+    query ="SELECT * FROM jobs WHERE job_id = \"%s\"" % job_id
     return query_sql(cursor, query)
 
 # Deletes job
 def delete_job(cursor, jobdetails):
     ##Add your code here
-    query = "UPDATE"
+    job_id = jobdetails['job_id']
+    query = "DELETE FROM jobs WHERE job_id = \"%s\"" % job_id
     return query_sql(cursor, query)
 
 
@@ -83,13 +85,21 @@ def add_or_delete_job(jobpage, cursor):
     # Add your code here to parse the job page
     for jobdetails in jobpage['jobs']:  # EXTRACTS EACH JOB FROM THE JOB LIST. It errored out until I specified jobs. This is because it needs to look at the jobs dictionary from the API. https://careerkarma.com/blog/python-typeerror-int-object-is-not-iterable/
         # Add in your code here to check if the job already exists in the DB
-        check_if_job_exists(cursor, jobdetails)
-        is_job_found = len(
-        cursor.fetchall()) > 0  # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
-        if is_job_found:
 
+        check_if_job_exists(cursor, jobdetails)
+        is_job_found = len(cursor.fetchall()) > 0  # https://stackoverflow.com/questions/2511679/python-number-of-rows-affected-by-cursor-executeselect
+        if is_job_found:
+            now = datetime.now()
+            jobs_date = datetime.strptime(jobdetails['publication_date'], "%Y-%m-%dT%H:%M:%S" )
+    # check jobs older han 14 days
+            if (now - jobs_date).day > 14:
+                print(f"too late no more job{jobdetails['job-id']} available")
+                delete_job(cursor, jobdetails)
         else:
             # INSERT JOB
+            add_new_job(cursor, jobdetails)
+            print(f"New job found matching: {jobdetails['job_id'], ['company']}")
+
             # Add in your code here to notify the user of a new posting. This code will notify the new user
 
 
